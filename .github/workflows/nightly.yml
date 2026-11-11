@@ -1,0 +1,38 @@
+name: Nightly Regression
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [api, contract, ui-chromium, ui-firefox, ui-webkit, hybrid]
+    env:
+      CI: 'true'
+      TEST_ENV: staging
+      UI_BASE_URL: ${{ vars.STAGING_UI_URL }}
+      API_BASE_URL: ${{ vars.STAGING_API_URL }}
+      API_TOKEN: ${{ secrets.STAGING_API_TOKEN }}
+      TEST_USERNAME: ${{ secrets.STAGING_USERNAME }}
+      TEST_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps
+      - run: npx playwright test --project=${{ matrix.project }}
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: regression-${{ matrix.project }}
+          path: |
+            test-results/
+            playwright-report/

@@ -1,0 +1,46 @@
+name: Playwright Hybrid QA
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [api, ui-chromium]
+    env:
+      CI: 'true'
+      TEST_ENV: staging
+      UI_BASE_URL: ${{ vars.STAGING_UI_URL }}
+      API_BASE_URL: ${{ vars.STAGING_API_URL }}
+      API_TOKEN: ${{ secrets.STAGING_API_TOKEN }}
+      TEST_USERNAME: ${{ secrets.STAGING_USERNAME }}
+      TEST_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: npm run typecheck
+      - name: Install browser
+        if: matrix.project == 'ui-chromium'
+        run: npx playwright install --with-deps chromium
+      - name: Run suite
+        run: npx playwright test --project=${{ matrix.project }} --grep @smoke
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: results-${{ matrix.project }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 14
