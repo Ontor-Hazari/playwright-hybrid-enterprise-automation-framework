@@ -9,7 +9,15 @@ export class HeaderComponent {
       .getByRole('banner')
       .getByRole('link', { name: /Test Cases/ });
   }
+  get productsLink(): Locator {
+    return this.page
+      .getByRole('banner')
+      .getByRole('link', { name: /Products/ });
+  }
   async openTestCases(): Promise<void> {
     await this.testCasesLink.click();
+  }
+  async openProducts(): Promise<void> {
+    await this.productsLink.click();
   }
 }

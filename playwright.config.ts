@@ -25,7 +25,7 @@ export default defineConfig({
   projects: [
     {
       name: 'ui-chromium',
-      testMatch: '**/ui/test-cases/verify-test-cases-page.spec.ts',
+      testMatch: '**/ui/test-cases/*.spec.ts',
       use: { ...devices['Desktop Chrome'] },
     },
   ],
