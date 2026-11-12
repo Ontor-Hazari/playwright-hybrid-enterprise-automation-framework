@@ -6,15 +6,11 @@ on:
     branches: [feature/ui-tests]
   workflow_dispatch:
 jobs:
-  smoke:
+  ui-tests:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        project: [ui-chromium]
     env:
       CI: 'true'
       TEST_ENV: staging
@@ -28,14 +24,52 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm run typecheck
       - name: Install browser
-        if: matrix.project == 'ui-chromium'
         run: npx playwright install --with-deps chromium
-      - name: Run suite
-        run: npx playwright test --project=${{ matrix.project }} --grep @smoke
+      - name: Run all UI test cases
+        run: npx playwright test --project=ui-chromium
+      - name: Add test results to the job summary
+        if: always()
+        run: |
+          node --input-type=module <<'NODE'
+          import { appendFileSync, existsSync, readFileSync } from 'node:fs';
+
+          const reportPath = 'test-results/results.json';
+          const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+
+          if (!existsSync(reportPath)) {
+            appendFileSync(
+              summaryPath,
+              '## UI test results\n\nPlaywright JSON report was not generated; tests may not have started.\n',
+            );
+            process.exit(0);
+          }
+
+          const { stats } = JSON.parse(readFileSync(reportPath, 'utf8'));
+          const { expected: passed, unexpected: failed, flaky, skipped } = stats;
+          const total = passed + failed + flaky + skipped;
+
+          const summary = [
+            '## UI test results',
+            '',
+            '| Result | Count |',
+            '| --- | ---: |',
+            `| Total | ${total} |`,
+            `| Passed | ${passed} |`,
+            `| Flaky | ${flaky} |`,
+            `| Failed | ${failed} |`,
+            `| Skipped | ${skipped} |`,
+            '',
+          ].join('\n');
+
+          appendFileSync(summaryPath, summary);
+          console.log(
+            `Total: ${total}; Passed: ${passed}; Flaky: ${flaky}; Failed: ${failed}; Skipped: ${skipped}`,
+          );
+          NODE
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: results-${{ matrix.project }}
+          name: ui-test-results
           path: |
             test-results/
             playwright-report/

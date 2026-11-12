@@ -13,6 +13,7 @@ export default defineConfig({
     ['list'],
     ['html', { open: 'never' }],
     ['junit', { outputFile: 'test-results/junit.xml' }],
+    ['json', { outputFile: 'test-results/results.json' }],
   ],
   outputDir: 'test-results/artifacts',
   use: {
