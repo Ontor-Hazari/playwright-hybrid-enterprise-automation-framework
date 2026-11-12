@@ -18,7 +18,7 @@ The default target for this repository is https://automationexercise.com/. If th
 - Language: TypeScript with strict typing.
 - Runner: `@playwright/test`.
 - UI design pattern: Page Object Model (POM), with component objects for genuinely reusable UI regions.
-- Tests: `tests/ui/<feature>/*.spec.ts`.
+- Tests: follow the repository's established location. The default is `tests/ui/<feature>/*.spec.ts`; preserve an existing convention such as `tests/ui/test-cases/` when already used. Do not relocate working tests just to match a generic example.
 - Page objects: `src/pages/<feature>/*.ts`.
 - Shared components: `src/pages/components/`.
 - Shared fixtures: `src/fixtures/test.ts`.
@@ -77,7 +77,7 @@ Inspect it against the repository conventions. Refactor only what is necessary f
 3. **Inspect the application:** navigate to the relevant page in the configured browser and verify current labels, roles, navigation, and behavior before choosing locators. If browser access is unavailable, state that selectors are provisional and do not claim they were verified.
 4. **Plan reuse:** find an existing page object/component before creating a new one. Extend it when appropriate; do not duplicate locators or actions.
 5. **Implement POM:** add user-oriented methods such as `open()`, `login()`, `searchProduct()`, `addToCart()`, and `submitContactForm()`. Avoid exposing low-level locator details to specs unless there is a clear reason.
-6. **Implement tests:** create focused specs under `tests/ui/<feature>/`. Use the shared fixture and existing project configuration.
+6. **Implement tests:** create focused specs using the repository's established UI test directory (default `tests/ui/<feature>/`; preserve an existing location such as `tests/ui/test-cases/`). Use the shared fixture and existing project configuration.
 7. **Manage test data:** use builders/factories or validated environment values. Generate unique identifiers for new records. Ensure cleanup is ownership-based and runs in `finally` or a test-scoped fixture.
 8. **Validate:** run the narrowest relevant Playwright test, then typecheck/lint/format commands available in the repository. Do not claim a command passed unless it was actually executed and its result observed.
 9. **Report:** list files changed, test-case IDs/scenarios implemented, screenshot-derived UI elements, assumptions, commands run, actual outcomes, and any blocked or unverified behavior.
@@ -123,10 +123,10 @@ Inspect it against the repository conventions. Refactor only what is necessary f
 
 When asked to generate automation from a screenshot or test case, implement the actual repository files when repository editing is available. The result should normally include:
 
-- `tests/ui/<feature>/<scenario>.spec.ts`
+- `tests/ui/<feature>/<scenario>.spec.ts` or the repository's already-established equivalent (for example, `tests/ui/test-cases/<scenario>.spec.ts`)
 - New or updated `src/pages/<feature>/*.ts` page object(s), only where needed
 - New or updated shared component object(s), only where needed
-- Test data builder/factory or fixture changes, only where needed
+- Static test-data module under `src/data/test-data/` and/or dynamic builder under `src/data/builders/`, only where needed
 - Updated documentation or traceability mapping when useful
 
 Always finish with:
@@ -148,10 +148,86 @@ Every implementation MUST use the same conventions below. Do not invent a second
 
 - Page objects: `src/pages/<feature>/<Feature>Page.ts` (PascalCase class and filename).
 - Reusable UI components: `src/pages/components/<ComponentName>.ts`.
-- Specs: `tests/ui/<feature>/<scenario>.spec.ts` (kebab-case filenames).
-- Test data: `src/data/builders/<Feature>Builder.ts` or the existing factory location.
+- Specs: follow the existing repository convention. Default to `tests/ui/<feature>/<scenario>.spec.ts`; preserve an established path such as `tests/ui/test-cases/<scenario>.spec.ts`. Use kebab-case filenames.
+- Static, reusable test data: `src/data/test-data/<feature>.data.ts` (for example, `products.data.ts`, `users.data.ts`).
+- Dynamic test data: `src/data/builders/<Feature>Builder.ts` or the existing factory location.
 - Shared fixtures: extend the existing `src/fixtures/test.ts`; never create a competing fixture entry point.
 - One page object per page or cohesive page area. Do not create a page object per test case.
+
+
+### Mandatory test-data strategy — static data vs dynamic data
+
+Use one consistent rule across every UI test. Do not place reusable business/test values directly in spec files just because it is convenient.
+
+- **Static reusable values** (known product names, category names, expected labels/counts, stable search terms, supported roles, and fixed non-secret scenario inputs) belong in `src/data/test-data/<feature>.data.ts`.
+- **Dynamic values** (unique email addresses, generated usernames, timestamps, random product/account payloads, and per-test entities) belong in the existing builder/factory under `src/data/builders/`.
+- **Environment-specific values** (base URLs, environment names, feature flags) belong in `config/`, not test-data files.
+- **Secrets** (passwords, tokens, cookies) belong in validated environment variables or the approved CI secret store. Never put secrets in source-controlled test-data files.
+- **One-off literal values** may remain in a spec only when they are genuinely local to that single assertion/scenario and extracting them would add indirection without reuse or clarity.
+- Group data by business feature; do not create one file per individual value or one data file per test case.
+- Keep data separate from page objects. Page objects accept values as parameters and must not import scenario-specific test data.
+- UI and API tests may reuse neutral domain data when the value has the same meaning, but do not couple UI tests to API fixture payloads or vice versa.
+- Before creating a data file, search for an existing feature data module and extend it rather than duplicating values.
+
+**Canonical static-data example** — `src/data/test-data/products.data.ts`:
+
+```ts
+export const productTestData = {
+  search: {
+    existingProduct: 'Blue Top',
+    expectedResultCount: 1,
+  },
+} as const;
+```
+
+**Canonical spec usage** — adapt the import extension to the repository's TypeScript/ESM convention:
+
+```ts
+import { test, expect } from '../../../src/fixtures/test.js';
+import { productTestData } from '../../../src/data/test-data/products.data.js';
+
+test('TC 9 - user can search for a product', async ({
+  homePage,
+  page,
+  productsPage,
+}) => {
+  const { existingProduct, expectedResultCount } = productTestData.search;
+
+  await homePage.open();
+  await expect(homePage.logo).toBeVisible();
+  await expect(page).toHaveTitle('Automation Exercise');
+
+  await homePage.openProducts();
+  await expect(page).toHaveURL('https://automationexercise.com/products');
+  await expect(productsPage.allProductsHeading).toBeVisible();
+
+  await productsPage.searchProduct(existingProduct);
+
+  await expect(page).toHaveURL(
+    new RegExp(`/products\\?search=${encodeURIComponent(existingProduct)}`),
+  );
+  await expect(productsPage.searchedProductsHeading).toBeVisible();
+  await expect(productsPage.searchResults).toHaveCount(expectedResultCount);
+  await expect(productsPage.searchResults.first()).toBeVisible();
+  await expect(productsPage.searchResults.first()).toContainText(existingProduct);
+});
+```
+
+The `Blue Top` value and expected count are example data for AutomationExercise; verify the live site before relying on them. Keep the expected result in test data only when it is stable scenario data, not when it should be derived from a changing application response.
+
+**Dynamic-data example** — use the project's existing builder. If none exists, add a feature builder rather than generating random values inline throughout specs:
+
+```ts
+import { randomUUID } from 'node:crypto';
+
+export class UserBuilder {
+  static uniqueEmail(): string {
+    return `qa-${randomUUID()}@example.test`;
+  }
+}
+```
+
+Do not add a builder for static values such as `Blue Top`; a simple typed data object is the correct abstraction.
 
 ### Canonical UI code pattern
 
@@ -228,3 +304,6 @@ If repository editing tools are available, create/update the files directly AND 
 - Do not duplicate an existing page object, component, fixture, data builder, or helper. Search first and extend the existing implementation.
 - Avoid generic `BasePage` methods unless multiple pages genuinely share the behavior. Do not add abstractions solely to increase folder count.
 - Never generate a new folder convention, import alias, fixture pattern, assertion style, or naming scheme for one test. All new tests must match the repository's established pattern.
+- Never hardcode reusable static scenario data in specs; use the feature data module. Keep truly one-off literals local when extraction adds no value.
+- Never put dynamic/generated records in static `.data.ts` files; use builders/factories.
+- Apply the same test-data policy to screenshot-derived tests and written test cases.

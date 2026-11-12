@@ -1,6 +1,6 @@
 import { test, expect } from '../../../src/fixtures/test.js';
 
-test('TC 7 - user can navigate to the Test Cases page', async ({
+test('TC 7 - verify the Test Cases page', async ({
   homePage,
   testCasesPage,
   page,
@@ -12,5 +12,8 @@ test('TC 7 - user can navigate to the Test Cases page', async ({
   await homePage.openTestCases();
 
   await expect(page).toHaveURL('https://automationexercise.com/test_cases');
+  await expect(page).toHaveTitle(
+    'Automation Practice Website for UI Testing - Test Cases',
+  );
   await expect(testCasesPage.heading).toBeVisible();
 });

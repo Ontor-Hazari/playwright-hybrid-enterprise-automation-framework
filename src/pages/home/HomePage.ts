@@ -27,4 +27,12 @@ export class HomePage extends BasePage {
   async openProducts(): Promise<void> {
     await this.header.openProducts();
   }
+
+  async openSignupLogin(): Promise<void> {
+    await this.header.openSignupLogin();
+  }
+
+  async openContactUs(): Promise<void> {
+    await this.header.openContactUs();
+  }
 }

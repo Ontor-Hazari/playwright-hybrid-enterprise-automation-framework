@@ -10,6 +10,9 @@ import { HomePage } from '../pages/home/HomePage.js';
 import { ProductsPage } from '../pages/products/ProductsPage.js';
 import { TestCasesPage } from '../pages/test-cases/TestCasesPage.js';
 import { UsersPage } from '../pages/users/UsersPage.js';
+import { ContactUsPage } from '../pages/contact-us/ContactUsPage.js';
+import { RegistrationPage } from '../pages/auth/RegistrationPage.js';
+import { AccountPage } from '../pages/auth/AccountPage.js';
 import { ApiClient } from '../api/core/ApiClient.js';
 import { UsersController } from '../api/controllers/UsersController.js';
 import { buildUser } from '../data/builders/UserBuilder.js';
@@ -22,6 +25,9 @@ type Fixtures = {
   productsPage: ProductsPage;
   testCasesPage: TestCasesPage;
   usersPage: UsersPage;
+  contactUsPage: ContactUsPage;
+  registrationPage: RegistrationPage;
+  accountPage: AccountPage;
   apiContext: APIRequestContext;
   usersApi: UsersController;
   createdUser: User;
@@ -42,6 +48,15 @@ export const test = base.extend<Fixtures>({
   },
   usersPage: async ({ page }, use) => {
     await use(new UsersPage(page));
+  },
+  contactUsPage: async ({ page }, use) => {
+    await use(new ContactUsPage(page));
+  },
+  registrationPage: async ({ page }, use) => {
+    await use(new RegistrationPage(page));
+  },
+  accountPage: async ({ page }, use) => {
+    await use(new AccountPage(page));
   },
   apiContext: async ({}, use) => {
     const context = await requestFactory.newContext({

@@ -121,8 +121,66 @@ Every API implementation MUST use the same TypeScript + Playwright APIRequestCon
 - Request/response types: `src/api/models/<Feature>.ts`.
 - Runtime schemas: `src/api/schemas/<feature>.schema.ts`.
 - API specs: `tests/api/<feature>/<scenario>.api.spec.ts`.
+- Static reusable scenario data: `src/data/test-data/<feature>.data.ts`.
+- Dynamic request/test entities: `src/data/builders/<Feature>Builder.ts` or the existing factory location.
 - Contract specs: `tests/contract/<feature>.contract.spec.ts`.
 - Shared API fixtures: extend the existing `src/fixtures/test.ts`; do not create another fixture module.
+
+
+### Mandatory test-data strategy — static data vs dynamic data
+
+Apply the same project-wide data convention used by UI automation. API specs must not become a second, inconsistent place for reusable test data.
+
+- **Static reusable values** (known search terms, documented enum values, stable non-secret request examples, expected status codes when they are scenario constants, and fixed identifiers explicitly provided by the test environment) belong in `src/data/test-data/<feature>.data.ts`.
+- **Dynamic values** (unique account emails, generated names, timestamps, random request payloads, and entities created by a test) belong in `src/data/builders/<Feature>Builder.ts` or the existing factory.
+- **Environment-specific values** (API base URL, environment name, feature flags) belong in `config/`.
+- **Secrets** (passwords, API tokens, credentials) belong in validated environment variables or the approved CI secret store. Never store them in `.data.ts`, models, schemas, or specs.
+- Keep request/response contracts in `src/api/models/`; do not mix model definitions with scenario test data.
+- Keep endpoint paths and HTTP transport in controllers/client, not in data files.
+- Group data by feature and reuse an existing module. Do not create one file per test case or duplicate the same domain value in UI and API data modules without a reason.
+- UI and API suites may share neutral domain data where semantics are identical; do not make API test-data modules depend on page objects or UI fixtures.
+- A one-off value may remain in a spec if it is genuinely local and extracting it would add needless indirection.
+
+**Canonical static-data example** — `src/data/test-data/products.data.ts`:
+
+```ts
+export const productApiTestData = {
+  search: {
+    existingProduct: 'Blue Top',
+  },
+} as const;
+```
+
+**Canonical spec usage** — adapt the import extension and fixture property to the actual repository:
+
+```ts
+import { test, expect } from '../../../src/fixtures/test.js';
+import { productApiTestData } from '../../../src/data/test-data/products.data.js';
+
+test('API - search products by name', async ({ productsApi }) => {
+  const response = await productsApi.search(productApiTestData.search.existingProduct);
+
+  expect(response.status()).toBe(200);
+  const payload: unknown = await response.json();
+  // Validate the actual documented response envelope with the existing schema.
+});
+```
+
+This is a pattern illustration, not a claim that the repository currently exposes `productsApi.search()` or that the API response has a particular shape. Inspect the actual controller, fixture, and official API catalogue before implementing. For AutomationExercise, use the documented form field `search_product` for `POST /searchProduct`.
+
+**Dynamic-data example** — create a unique synthetic account value through a builder, not a static data file:
+
+```ts
+import { randomUUID } from 'node:crypto';
+
+export class AccountBuilder {
+  static uniqueEmail(): string {
+    return `qa-${randomUUID()}@example.test`;
+  }
+}
+```
+
+Never use a builder to generate values that are fixed and reusable, such as a known product search term. Never place generated account credentials in committed static data.
 
 ### Canonical API code pattern
 
@@ -218,8 +276,11 @@ If repository editing is available, create/update the files directly and summari
 - Preserve raw status/body diagnostics. Never convert every non-2xx response into success or silently swallow request errors.
 - Use `form` for documented form-encoded operations, `params` for query parameters, and `data` only when the endpoint contract expects a JSON body.
 - Validate response content and schema after checking the documented/observed response shape. Avoid brittle full-response snapshots for changing catalogues.
-- Generate unique synthetic data for state-changing tests. Clean up only resources the current test created and owns, preferably in `try/finally` or a scoped fixture.
+- Generate unique synthetic data for state-changing tests using the feature builder/factory. Keep reusable static values in `src/data/test-data/`. Clean up only resources the current test created and owns, preferably in `try/finally` or a scoped fixture.
 - Do not run account create/update/delete tests concurrently against a shared public practice site unless isolation and ownership are guaranteed.
 - Never hardcode credentials, tokens, private customer data, or real personal information. Redact secrets from logs, traces, reports, and assertion messages.
 - Do not invent authentication headers or API capabilities. AutomationExercise's documented account endpoints use their documented email/password parameters.
-- Search for and extend existing models, controllers, schemas, fixtures, and helpers before adding new files. Never create a second API client or a second fixture system for one feature.
+- Search for and extend existing models, controllers, schemas, fixtures, data modules, and helpers before adding new files. Never create a second API client or a second fixture system for one feature.
+- Never hardcode reusable scenario data in API specs; use the feature `.data.ts` module. Keep truly one-off values local when extraction adds no value.
+- Never put dynamic/generated entities in static `.data.ts` files; use builders/factories.
+- Apply the same test-data convention across UI, API, hybrid, and contract suites.
