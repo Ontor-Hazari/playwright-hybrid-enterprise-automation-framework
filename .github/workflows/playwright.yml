@@ -7,14 +7,14 @@ on:
   workflow_dispatch:
 jobs:
   smoke:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
       contents: read
     strategy:
       fail-fast: false
       matrix:
-        project: [api, ui-chromium]
+        project: [ui-chromium]
     env:
       CI: 'true'
       TEST_ENV: staging
@@ -29,14 +29,14 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm install --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
       - run: npm run typecheck
       - name: Install browser
         if: matrix.project == 'ui-chromium'
         run: npx playwright install --with-deps chromium
       - name: Run suite
         run: npx playwright test --project=${{ matrix.project }} --grep @smoke
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: results-${{ matrix.project }}

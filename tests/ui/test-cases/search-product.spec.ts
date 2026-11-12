@@ -1,7 +1,7 @@
 import { test, expect } from '../../../src/fixtures/test.js';
 import { productTestData } from '../../../src/data/test-data/products.data.js';
 
-test('TC 9 - user can search for a product', async ({
+test('TC 9 - user can search for a product @smoke', async ({
   homePage,
   page,
   productsPage,

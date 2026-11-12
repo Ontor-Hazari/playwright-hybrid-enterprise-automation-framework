@@ -1,6 +1,6 @@
 import { test, expect } from '../../../src/fixtures/test.js';
 
-test('TC 7 - verify the Test Cases page', async ({
+test('TC 7 - verify the Test Cases page @smoke', async ({
   homePage,
   testCasesPage,
   page,
