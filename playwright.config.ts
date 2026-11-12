@@ -17,7 +17,7 @@ export default defineConfig({
   outputDir: 'test-results/artifacts',
   use: {
     baseURL: env.uiBaseURL,
-    headless: false,
+    headless: true,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
