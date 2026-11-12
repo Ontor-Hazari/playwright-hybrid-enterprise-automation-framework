@@ -11,6 +11,13 @@ export class LoginPage extends BasePage {
     return this.page.getByRole('heading', { name: 'Login to your account' });
   }
 
+  get loginErrorMessage(): Locator {
+    return this.loginForm.getByText(
+      'Your email or password is incorrect!',
+      { exact: true },
+    );
+  }
+
   private get signupForm(): Locator {
     return this.page
       .locator('form')

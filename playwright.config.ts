@@ -21,12 +21,14 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+  
   },
   projects: [
     {
       name: 'ui-chromium',
       testMatch: '**/ui/test-cases/*.spec.ts',
       use: { ...devices['Desktop Chrome'] },
+      workers : 1
     },
   ],
 });
