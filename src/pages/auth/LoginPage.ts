@@ -7,10 +7,20 @@ export class LoginPage extends BasePage {
     return this.page.getByRole('heading', { name: 'New User Signup!' });
   }
 
+  get loginToAccountHeading(): Locator {
+    return this.page.getByRole('heading', { name: 'Login to your account' });
+  }
+
   private get signupForm(): Locator {
     return this.page
       .locator('form')
       .filter({ has: this.page.getByRole('button', { name: 'Signup' }) });
+  }
+
+  private get loginForm(): Locator {
+    return this.page
+      .locator('form')
+      .filter({ has: this.page.getByRole('button', { name: 'Login' }) });
   }
 
   private get signupNameInput(): Locator {
@@ -25,6 +35,18 @@ export class LoginPage extends BasePage {
     return this.signupForm.getByRole('button', { name: 'Signup' });
   }
 
+  private get loginEmailInput(): Locator {
+    return this.loginForm.getByPlaceholder('Email Address');
+  }
+
+  private get loginPasswordInput(): Locator {
+    return this.loginForm.getByPlaceholder('Password');
+  }
+
+  private get loginButton(): Locator {
+    return this.loginForm.getByRole('button', { name: 'Login' });
+  }
+
   async open(): Promise<void> { await this.visit('/login'); }
 
   async signup(name: string, email: string): Promise<void> {
@@ -33,9 +55,9 @@ export class LoginPage extends BasePage {
     await this.signupButton.click();
   }
 
-  async login(username: string, password: string): Promise<void> {
-    await this.page.getByLabel('Username').fill(username);
-    await this.page.getByLabel('Password').fill(password);
-    await this.page.getByRole('button', { name: 'Sign in' }).click();
+  async login(email: string, password: string): Promise<void> {
+    await this.loginEmailInput.fill(email);
+    await this.loginPasswordInput.fill(password);
+    await this.loginButton.click();
   }
 }

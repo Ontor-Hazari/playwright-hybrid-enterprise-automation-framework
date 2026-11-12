@@ -22,6 +22,10 @@ export class AccountPage extends BasePage {
     return this.page.getByRole('banner').getByText(/Logged in as/);
   }
 
+  private get logoutLink(): Locator {
+    return this.page.getByRole('banner').getByRole('link', { name: /Logout/ });
+  }
+
   private get deleteAccountLink(): Locator {
     return this.page
       .getByRole('banner')
@@ -34,5 +38,9 @@ export class AccountPage extends BasePage {
 
   async deleteAccount(): Promise<void> {
     await this.deleteAccountLink.click();
+  }
+
+  async logout(): Promise<void> {
+    await this.logoutLink.click();
   }
 }
