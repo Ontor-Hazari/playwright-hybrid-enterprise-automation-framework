@@ -18,11 +18,7 @@ jobs:
     env:
       CI: 'true'
       TEST_ENV: staging
-      UI_BASE_URL: ${{ vars.STAGING_UI_URL }}
-      API_BASE_URL: ${{ vars.STAGING_API_URL }}
-      API_TOKEN: ${{ secrets.STAGING_API_TOKEN }}
-      TEST_USERNAME: ${{ secrets.STAGING_USERNAME }}
-      TEST_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
+      UI_BASE_URL: ${{ vars.STAGING_UI_URL || 'https://automationexercise.com' }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
