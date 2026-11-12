@@ -1,9 +1,9 @@
 name: Playwright Hybrid QA
 on:
   push:
-    branches: [main]
+    branches: [feature/ui-tests]
   pull_request:
-    branches: [main]
+    branches: [feature/ui-tests]
   workflow_dispatch:
 jobs:
   smoke:
