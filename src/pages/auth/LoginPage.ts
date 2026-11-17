@@ -18,6 +18,12 @@ export class LoginPage extends BasePage {
     );
   }
 
+  get signupErrorMessage(): Locator {
+    return this.signupForm.getByText('Email Address already exist!', {
+      exact: true,
+    });
+  }
+
   private get signupForm(): Locator {
     return this.page
       .locator('form')
