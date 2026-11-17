@@ -29,6 +29,17 @@ export class ProductsPage extends BasePage {
     return this.page.locator('.features_items .product-image-wrapper');
   }
 
+  get firstProductName(): Locator {
+    return this.searchResults.first().locator('.productinfo p');
+  }
+
+  async viewFirstProduct(): Promise<void> {
+    await this.searchResults
+      .first()
+      .getByRole('link', { name: 'View Product' })
+      .click();
+  }
+
   async searchProduct(productName: string): Promise<void> {
     await this.searchInput.fill(productName);
     await this.searchButton.click();
