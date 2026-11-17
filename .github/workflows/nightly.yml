@@ -26,6 +26,60 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test --project=${{ matrix.project }}
+      - name: Add test results to the job summary
+        if: always()
+        env:
+          PROJECT: ${{ matrix.project }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { appendFileSync, existsSync, readFileSync } from 'node:fs';
+
+          const reportPath = 'test-results/results.json';
+          const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+          const title = `## Nightly regression results (${process.env.PROJECT})`;
+
+          if (!existsSync(reportPath)) {
+            appendFileSync(
+              summaryPath,
+              `${title}\n\nPlaywright JSON report was not generated; tests may not have started.\n`,
+            );
+            process.exit(0);
+          }
+
+          const { stats, suites } = JSON.parse(readFileSync(reportPath, 'utf8'));
+          const { expected: passed, unexpected: failed, flaky, skipped } = stats;
+          const total = passed + failed + flaky + skipped;
+
+          const failedTitles = [];
+          const collect = (suite, parents) => {
+            const path = suite.title ? [...parents, suite.title] : parents;
+            for (const spec of suite.specs ?? []) {
+              if (!spec.ok) failedTitles.push(spec.title);
+            }
+            for (const child of suite.suites ?? []) collect(child, path);
+          };
+          for (const suite of suites) collect(suite, []);
+
+          const lines = [
+            title,
+            '',
+            '| Result | Count |',
+            '| --- | ---: |',
+            `| Total | ${total} |`,
+            `| Passed | ${passed} |`,
+            `| Flaky | ${flaky} |`,
+            `| Failed | ${failed} |`,
+            `| Skipped | ${skipped} |`,
+            '',
+          ];
+          if (failedTitles.length > 0) {
+            lines.push('### Failed tests', '', ...failedTitles.map((t) => `- ${t}`), '');
+          }
+          appendFileSync(summaryPath, lines.join('\n'));
+          console.log(
+            `Total: ${total}; Passed: ${passed}; Flaky: ${flaky}; Failed: ${failed}; Skipped: ${skipped}`,
+          );
+          NODE
       - uses: actions/upload-artifact@v7
         if: always()
         with:
