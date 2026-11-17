@@ -8,6 +8,7 @@ import { env } from '../../config/env.js';
 import { LoginPage } from '../pages/auth/LoginPage.js';
 import { HomePage } from '../pages/home/HomePage.js';
 import { ProductsPage } from '../pages/products/ProductsPage.js';
+import { CartPage } from '../pages/cart/CartPage.js';
 import { ProductDetailsPage } from '../pages/products/ProductDetailsPage.js';
 import { TestCasesPage } from '../pages/test-cases/TestCasesPage.js';
 import { UsersPage } from '../pages/users/UsersPage.js';
@@ -24,6 +25,7 @@ type Fixtures = {
   loginPage: LoginPage;
   homePage: HomePage;
   productsPage: ProductsPage;
+  cartPage: CartPage;
   productDetailsPage: ProductDetailsPage;
   testCasesPage: TestCasesPage;
   usersPage: UsersPage;
@@ -44,6 +46,9 @@ export const test = base.extend<Fixtures>({
   },
   productsPage: async ({ page }, use) => {
     await use(new ProductsPage(page));
+  },
+  cartPage: async ({ page }, use) => {
+    await use(new CartPage(page));
   },
   productDetailsPage: async ({ page }, use) => {
     await use(new ProductDetailsPage(page));

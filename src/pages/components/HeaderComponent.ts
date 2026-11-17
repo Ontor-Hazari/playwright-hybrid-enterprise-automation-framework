@@ -1,4 +1,4 @@
-import type { Page, Locator } from '@playwright/test';
+﻿import type { Page, Locator } from '@playwright/test';
 export class HeaderComponent {
   constructor(private readonly page: Page) {}
   get profileButton(): Locator {
@@ -13,6 +13,9 @@ export class HeaderComponent {
     return this.page
       .getByRole('banner')
       .getByRole('link', { name: /Products/ });
+  }
+  get cartLink(): Locator {
+    return this.page.getByRole('banner').getByRole('link', { name: /Cart/ });
   }
   get signupLoginLink(): Locator {
     return this.page
@@ -38,6 +41,9 @@ export class HeaderComponent {
   async openProducts(): Promise<void> {
     await this.productsLink.click();
   }
+  async openCart(): Promise<void> {
+    await this.cartLink.click();
+  }
   async openSignupLogin(): Promise<void> {
     await this.signupLoginLink.click();
   }
@@ -45,3 +51,4 @@ export class HeaderComponent {
     await this.contactUsLink.click();
   }
 }
+

@@ -40,6 +40,40 @@ export class ProductsPage extends BasePage {
       .click();
   }
 
+  productCard(index: number): Locator {
+    return this.searchResults.nth(index);
+  }
+
+  async addProductToCart(index: number): Promise<void> {
+    const card = this.productCard(index);
+    await card.hover();
+    await card.locator('.product-overlay .add-to-cart').click();
+  }
+
+  productName(index: number): Locator {
+    return this.productCard(index).locator('.productinfo p');
+  }
+
+  productPrice(index: number): Locator {
+    return this.productCard(index).locator('.productinfo h2');
+  }
+
+  get continueShoppingButton(): Locator {
+    return this.page.getByRole('button', { name: 'Continue Shopping' });
+  }
+
+  get viewCartLink(): Locator {
+    return this.page.getByRole('link', { name: 'View Cart' });
+  }
+
+  async continueShopping(): Promise<void> {
+    await this.continueShoppingButton.click();
+  }
+
+  async openCartFromModal(): Promise<void> {
+    await this.viewCartLink.click();
+  }
+
   async searchProduct(productName: string): Promise<void> {
     await this.searchInput.fill(productName);
     await this.searchButton.click();
