@@ -1,9 +1,29 @@
 import type { Locator, Page } from '@playwright/test';
 import { BasePage } from '../base/BasePage.js';
+import { SidebarComponent } from '../components/SidebarComponent.js';
 
 export class ProductsPage extends BasePage {
+  readonly sidebar: SidebarComponent;
+
   constructor(page: Page) {
     super(page);
+    this.sidebar = new SidebarComponent(page);
+  }
+
+  get listingTitle(): Locator {
+    return this.page.locator('.features_items .title');
+  }
+
+  get productNames(): Locator {
+    return this.page.locator('.features_items .productinfo p');
+  }
+
+  async addAllProductsToCart(): Promise<void> {
+    const count = await this.searchResults.count();
+    for (let index = 0; index < count; index++) {
+      await this.addProductToCart(index);
+      await this.continueShopping();
+    }
   }
 
   get allProductsHeading(): Locator {

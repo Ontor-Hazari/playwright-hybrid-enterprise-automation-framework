@@ -15,6 +15,8 @@ import { UsersPage } from '../pages/users/UsersPage.js';
 import { ContactUsPage } from '../pages/contact-us/ContactUsPage.js';
 import { RegistrationPage } from '../pages/auth/RegistrationPage.js';
 import { AccountPage } from '../pages/auth/AccountPage.js';
+import { CheckoutPage } from '../pages/checkout/CheckoutPage.js';
+import { PaymentPage } from '../pages/checkout/PaymentPage.js';
 import { ApiClient } from '../api/core/ApiClient.js';
 import { UsersController } from '../api/controllers/UsersController.js';
 import { buildUser } from '../data/builders/UserBuilder.js';
@@ -32,12 +34,22 @@ type Fixtures = {
   contactUsPage: ContactUsPage;
   registrationPage: RegistrationPage;
   accountPage: AccountPage;
+  checkoutPage: CheckoutPage;
+  paymentPage: PaymentPage;
   apiContext: APIRequestContext;
   usersApi: UsersController;
   createdUser: User;
 };
 
 export const test = base.extend<Fixtures>({
+  page: async ({ page }, use) => {
+    // Third-party ads overlay the UI and intercept clicks; they are not under test.
+    await page.route(
+      /(googlesyndication|doubleclick|googleadservices|adservice\.google)\./,
+      (route) => route.abort(),
+    );
+    await use(page);
+  },
   loginPage: async ({ page }, use) => {
     await use(new LoginPage(page));
   },
@@ -67,6 +79,12 @@ export const test = base.extend<Fixtures>({
   },
   accountPage: async ({ page }, use) => {
     await use(new AccountPage(page));
+  },
+  checkoutPage: async ({ page }, use) => {
+    await use(new CheckoutPage(page));
+  },
+  paymentPage: async ({ page }, use) => {
+    await use(new PaymentPage(page));
   },
   apiContext: async ({}, use) => {
     const context = await requestFactory.newContext({
