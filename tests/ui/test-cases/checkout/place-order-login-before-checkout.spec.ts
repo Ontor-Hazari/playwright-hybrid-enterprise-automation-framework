@@ -1,14 +1,14 @@
-import { test, expect } from '../../../src/fixtures/test.js';
-import { buildRegistrationUser } from '../../../src/data/builders/RegistrationBuilder.js';
-import { checkoutTestData } from '../../../src/data/test-data/checkout.data.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
+import { buildRegistrationUser } from '../../../../src/data/builders/RegistrationBuilder.js';
+import { checkoutTestData } from '../../../../src/data/test-data/checkout.data.js';
 import {
   cleanupAccount,
   deleteOwnAccount,
   newAccountState,
   registerUser,
-} from '../../../src/flows/account-flow.js';
+} from '../../../../src/flows/account-flow.js';
 
-test('TC 16 - place order and login before checkout', async ({
+test('TC 16 - place order and login before checkout @checkout', async ({
   homePage,
   productsPage,
   cartPage,

@@ -1,7 +1,7 @@
-import { test, expect } from '../../../src/fixtures/test.js';
-import { buildUnregisteredLoginCredentials } from '../../../src/data/builders/LoginCredentialsBuilder.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
+import { buildUnregisteredLoginCredentials } from '../../../../src/data/builders/LoginCredentialsBuilder.js';
 
-test('TC 3 - user sees an error with incorrect login credentials', async ({
+test('TC 3 - user sees an error with incorrect login credentials @auth', async ({
   homePage,
   loginPage,
   page,

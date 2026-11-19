@@ -1,8 +1,8 @@
-import { test, expect } from '../../../src/fixtures/test.js';
-import { subscriptionTestData } from '../../../src/data/test-data/subscription.data.js';
-import { buildSubscriptionEmail } from '../../../src/data/builders/SubscriptionBuilder.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
+import { subscriptionTestData } from '../../../../src/data/test-data/subscription.data.js';
+import { buildSubscriptionEmail } from '../../../../src/data/builders/SubscriptionBuilder.js';
 
-test('TC 10 - verify subscription in home page', async ({ homePage, page }) => {
+test('TC 10 - verify subscription in home page @subscription', async ({ homePage, page }) => {
   await homePage.open();
   await expect(homePage.logo).toBeVisible();
   await expect(page).toHaveTitle('Automation Exercise');

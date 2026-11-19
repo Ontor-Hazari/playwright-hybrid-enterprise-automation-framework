@@ -1,7 +1,7 @@
-import { test, expect } from '../../../src/fixtures/test.js';
-import { catalogTestData } from '../../../src/data/test-data/catalog.data.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
+import { catalogTestData } from '../../../../src/data/test-data/catalog.data.js';
 
-test('TC 19 - user can view brand products', async ({
+test('TC 19 - user can view brand products @catalog', async ({
   homePage,
   productsPage,
   page,

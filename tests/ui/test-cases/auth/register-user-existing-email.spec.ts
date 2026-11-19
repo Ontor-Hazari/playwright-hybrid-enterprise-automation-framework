@@ -1,7 +1,7 @@
-import { test, expect } from '../../../src/fixtures/test.js';
-import { buildRegistrationUser } from '../../../src/data/builders/RegistrationBuilder.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
+import { buildRegistrationUser } from '../../../../src/data/builders/RegistrationBuilder.js';
 
-test('TC 2 - user can log in with valid credentials and delete their account', async ({
+test('TC 5 - user cannot register with an existing email address @auth', async ({
   homePage,
   loginPage,
   registrationPage,
@@ -17,10 +17,8 @@ test('TC 2 - user can log in with valid credentials and delete their account', a
   await expect(page).toHaveTitle('Automation Exercise');
 
   await homePage.openSignupLogin();
-  await expect(loginPage.loginToAccountHeading).toBeVisible();
   await expect(loginPage.newUserSignupHeading).toBeVisible();
   await loginPage.signup(user.name, user.email);
-
   await expect(registrationPage.accountInformationHeading).toBeVisible();
   await registrationPage.fillAccountInformation(
     user.title,
@@ -32,22 +30,16 @@ test('TC 2 - user can log in with valid credentials and delete their account', a
   try {
     await registrationPage.createAccount();
     accountCreated = true;
-
     await expect(accountPage.accountCreatedHeading).toBeVisible();
     await accountPage.continue();
     await expect(accountPage.loggedInAsUser).toContainText(user.name);
 
     await accountPage.logout();
     await expect(loginPage.loginToAccountHeading).toBeVisible();
+    await expect(loginPage.newUserSignupHeading).toBeVisible();
 
-    await loginPage.login(user.email, user.password);
-    await expect(accountPage.loggedInAsUser).toContainText(user.name);
-
-    await accountPage.deleteAccount();
-    accountDeleted = true;
-    await expect(accountPage.accountDeletedHeading).toBeVisible();
-    await accountPage.continue();
-    await expect(homePage.logo).toBeVisible();
+    await loginPage.signup(user.name, user.email);
+    await expect(loginPage.signupErrorMessage).toBeVisible();
   } finally {
     if (accountCreated && !accountDeleted) {
       if (await accountPage.accountDeletedHeading.isVisible()) {
@@ -64,6 +56,7 @@ test('TC 2 - user can log in with valid credentials and delete their account', a
         }
         await accountPage.deleteAccount();
         await expect(accountPage.accountDeletedHeading).toBeVisible();
+        accountDeleted = true;
         await accountPage.continue();
       }
     }

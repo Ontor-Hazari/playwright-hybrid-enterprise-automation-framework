@@ -1,8 +1,8 @@
-import { test, expect } from '../../../src/fixtures/test.js';
-import { catalogTestData } from '../../../src/data/test-data/catalog.data.js';
-import { buildReviewEmail } from '../../../src/data/builders/ReviewBuilder.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
+import { catalogTestData } from '../../../../src/data/test-data/catalog.data.js';
+import { buildReviewEmail } from '../../../../src/data/builders/ReviewBuilder.js';
 
-test('TC 21 - user can add a review on a product', async ({
+test('TC 21 - user can add a review on a product @catalog', async ({
   homePage,
   productsPage,
   productDetailsPage,

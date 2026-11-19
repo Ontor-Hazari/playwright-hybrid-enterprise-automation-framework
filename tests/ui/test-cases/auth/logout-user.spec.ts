@@ -1,7 +1,7 @@
-import { test, expect } from '../../../src/fixtures/test.js';
-import { buildRegistrationUser } from '../../../src/data/builders/RegistrationBuilder.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
+import { buildRegistrationUser } from '../../../../src/data/builders/RegistrationBuilder.js';
 
-test('TC 5 - user cannot register with an existing email address', async ({
+test('TC 4 - user can log out of their account @auth', async ({
   homePage,
   loginPage,
   registrationPage,
@@ -35,11 +35,8 @@ test('TC 5 - user cannot register with an existing email address', async ({
     await expect(accountPage.loggedInAsUser).toContainText(user.name);
 
     await accountPage.logout();
+    await expect(page).toHaveURL('https://automationexercise.com/login');
     await expect(loginPage.loginToAccountHeading).toBeVisible();
-    await expect(loginPage.newUserSignupHeading).toBeVisible();
-
-    await loginPage.signup(user.name, user.email);
-    await expect(loginPage.signupErrorMessage).toBeVisible();
   } finally {
     if (accountCreated && !accountDeleted) {
       if (await accountPage.accountDeletedHeading.isVisible()) {

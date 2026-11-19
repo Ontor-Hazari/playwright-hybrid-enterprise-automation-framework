@@ -99,7 +99,10 @@ Inspect it against the repository conventions. Refactor only what is necessary f
 - Keep assertions in spec files; page objects may expose locators or state-query methods but should not own scenario expectations.
 - Cover positive, negative, boundary, and validation paths when required by the supplied case, not by indiscriminate test multiplication.
 - Do not assert implementation details that users cannot observe unless the test explicitly targets accessibility, network behavior, or a technical contract.
-- Use tags such as `@smoke` and `@regression` consistently with existing project conventions.
+- Every test title must carry exactly one group tag and may also carry `@smoke` or `@regression`: `@auth`, `@catalog`, `@cart`, `@checkout`, `@subscription`, `@static`. Example: `test('TC 15 - place order and register before checkout @checkout @regression', ...)`.
+- Place each spec in the matching cluster folder: `tests/ui/test-cases/<group>/<scenario>.spec.ts` (for example `tests/ui/test-cases/checkout/`). Import paths from there are `../../../../src/...`.
+- Assign the group by business feature. Reuse an existing group before inventing a new one, and list any new group in this file and in the CI workflows.
+- Tests in a group must stay independent. Do not make one test depend on another test in the same group.
 - Do not weaken assertions, skip failures, or add retries merely to make tests green.
 
 ## Authentication and secrets

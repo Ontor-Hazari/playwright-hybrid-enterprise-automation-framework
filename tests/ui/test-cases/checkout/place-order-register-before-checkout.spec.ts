@@ -1,13 +1,14 @@
-import { test, expect } from '../../../src/fixtures/test.js';
-import { buildRegistrationUser } from '../../../src/data/builders/RegistrationBuilder.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
+import { buildRegistrationUser } from '../../../../src/data/builders/RegistrationBuilder.js';
+import { checkoutTestData } from '../../../../src/data/test-data/checkout.data.js';
 import {
   cleanupAccount,
   deleteOwnAccount,
   newAccountState,
   registerUser,
-} from '../../../src/flows/account-flow.js';
+} from '../../../../src/flows/account-flow.js';
 
-test('TC 23 - checkout addresses match the registration address', async ({
+test('TC 15 - place order and register before checkout @checkout', async ({
   homePage,
   productsPage,
   cartPage,
@@ -15,21 +16,12 @@ test('TC 23 - checkout addresses match the registration address', async ({
   registrationPage,
   accountPage,
   checkoutPage,
+  paymentPage,
   page,
 }) => {
   const user = buildRegistrationUser();
   const state = newAccountState();
   const pages = { loginPage, registrationPage, accountPage };
-  const { address } = user;
-  const expectedLines = [
-    `${address.firstName} ${address.lastName}`,
-    address.company,
-    address.address,
-    address.address2,
-    `${address.city} ${address.state} ${address.zipcode}`,
-    address.country,
-    address.mobileNumber,
-  ];
 
   await homePage.open();
   await expect(homePage.logo).toBeVisible();
@@ -46,11 +38,14 @@ test('TC 23 - checkout addresses match the registration address', async ({
 
     await cartPage.proceedToCheckout();
     await expect(checkoutPage.addressDetailsHeading).toBeVisible();
+    await expect(checkoutPage.reviewOrderHeading).toBeVisible();
+    await expect(checkoutPage.orderRows).toHaveCount(1);
 
-    for (const line of expectedLines) {
-      await expect(checkoutPage.deliveryAddress).toContainText(line);
-      await expect(checkoutPage.billingAddress).toContainText(line);
-    }
+    await checkoutPage.placeOrder(checkoutTestData.comment);
+    await paymentPage.fillPaymentDetails(checkoutTestData.payment);
+    await paymentPage.payAndConfirm();
+    await expect(paymentPage.orderPlacedHeading).toBeVisible();
+    await expect(paymentPage.orderConfirmedMessage).toBeVisible();
 
     await deleteOwnAccount(pages, user, state);
   } finally {

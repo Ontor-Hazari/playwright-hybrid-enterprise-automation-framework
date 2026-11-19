@@ -1,7 +1,7 @@
-import { test, expect } from '../../../src/fixtures/test.js';
-import { buildRegistrationUser } from '../../../src/data/builders/RegistrationBuilder.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
+import { buildRegistrationUser } from '../../../../src/data/builders/RegistrationBuilder.js';
 
-test('TC 1 - user can register and delete their account', async ({
+test('TC 1 - user can register and delete their account @auth', async ({
   homePage,
   loginPage,
   registrationPage,

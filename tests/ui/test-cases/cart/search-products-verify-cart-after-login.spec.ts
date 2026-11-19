@@ -1,14 +1,14 @@
-import { test, expect } from '../../../src/fixtures/test.js';
-import { buildRegistrationUser } from '../../../src/data/builders/RegistrationBuilder.js';
-import { catalogTestData } from '../../../src/data/test-data/catalog.data.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
+import { buildRegistrationUser } from '../../../../src/data/builders/RegistrationBuilder.js';
+import { catalogTestData } from '../../../../src/data/test-data/catalog.data.js';
 import {
   cleanupAccount,
   deleteOwnAccount,
   newAccountState,
   registerUser,
-} from '../../../src/flows/account-flow.js';
+} from '../../../../src/flows/account-flow.js';
 
-test('TC 20 - searched products stay in the cart after login', async ({
+test('TC 20 - searched products stay in the cart after login @cart', async ({
   homePage,
   productsPage,
   cartPage,

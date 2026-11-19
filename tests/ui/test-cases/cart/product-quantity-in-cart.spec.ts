@@ -1,6 +1,6 @@
-import { test, expect } from '../../../src/fixtures/test.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
 
-test('TC 13 - product quantity is kept in the cart', async ({
+test('TC 13 - product quantity is kept in the cart @cart', async ({
   homePage,
   productDetailsPage,
   cartPage,

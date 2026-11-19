@@ -1,14 +1,14 @@
-import { test, expect } from '../../../src/fixtures/test.js';
-import { buildRegistrationUser } from '../../../src/data/builders/RegistrationBuilder.js';
-import { checkoutTestData } from '../../../src/data/test-data/checkout.data.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
+import { buildRegistrationUser } from '../../../../src/data/builders/RegistrationBuilder.js';
+import { checkoutTestData } from '../../../../src/data/test-data/checkout.data.js';
 import {
   cleanupAccount,
   deleteOwnAccount,
   newAccountState,
   registerUser,
-} from '../../../src/flows/account-flow.js';
+} from '../../../../src/flows/account-flow.js';
 
-test('TC 24 - user can download the invoice after purchase', async ({
+test('TC 24 - user can download the invoice after purchase @checkout', async ({
   homePage,
   productsPage,
   cartPage,

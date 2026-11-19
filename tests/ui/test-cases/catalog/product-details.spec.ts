@@ -1,6 +1,6 @@
-import { test, expect } from '../../../src/fixtures/test.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
 
-test('TC 8 - verify all products and product detail page', async ({
+test('TC 8 - verify all products and product detail page @catalog', async ({
   homePage,
   page,
   productsPage,

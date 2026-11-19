@@ -1,8 +1,8 @@
-import { test, expect } from '../../../src/fixtures/test.js';
-import { subscriptionTestData } from '../../../src/data/test-data/subscription.data.js';
-import { buildSubscriptionEmail } from '../../../src/data/builders/SubscriptionBuilder.js';
+import { test, expect } from '../../../../src/fixtures/test.js';
+import { subscriptionTestData } from '../../../../src/data/test-data/subscription.data.js';
+import { buildSubscriptionEmail } from '../../../../src/data/builders/SubscriptionBuilder.js';
 
-test('TC 11 - verify subscription in cart page', async ({
+test('TC 11 - verify subscription in cart page @subscription', async ({
   homePage,
   cartPage,
   page,
