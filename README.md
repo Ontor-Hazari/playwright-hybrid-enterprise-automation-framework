@@ -23,8 +23,8 @@ Windows PowerShell: `$env:TEST_ENV='staging'; npm run test:api`.
 - `src/api`: API transport, feature controllers, models and Zod response schemas.
 - `src/fixtures`: lazily injected page objects, API controllers, data with cleanup.
 - `src/data/builders`: unique deterministic-shape test payloads.
-- `tests/ui`, `tests/api`, `tests/contract`, `tests/hybrid`: separate suites sharing infrastructure.
-- `tests/setup`: preflight environment health check (project dependency).
+- `tests/ui`, `tests/api`: separate suites sharing infrastructure.
+- `src/data/files`: static files used as test data (for example the Contact Us upload).
 - `.github/workflows`: PR smoke suite and nightly regression.
 
 ## Modify for a new project

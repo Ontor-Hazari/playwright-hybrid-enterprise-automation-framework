@@ -1,9 +1,6 @@
 ﻿import type { Page, Locator } from '@playwright/test';
 export class HeaderComponent {
   constructor(private readonly page: Page) {}
-  get profileButton(): Locator {
-    return this.page.getByRole('button', { name: 'Profile' });
-  }
   get testCasesLink(): Locator {
     return this.page
       .getByRole('banner')
@@ -26,14 +23,6 @@ export class HeaderComponent {
     return this.page
       .getByRole('banner')
       .getByRole('link', { name: /Contact us/i });
-  }
-  get loggedInAsUser(): Locator {
-    return this.page.getByRole('banner').getByText(/Logged in as/);
-  }
-  get deleteAccountLink(): Locator {
-    return this.page
-      .getByRole('banner')
-      .getByRole('link', { name: /Delete Account/ });
   }
   async openTestCases(): Promise<void> {
     await this.testCasesLink.click();

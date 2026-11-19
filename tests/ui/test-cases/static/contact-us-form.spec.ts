@@ -3,7 +3,7 @@ import { test, expect } from '../../../../src/fixtures/test.js';
 import { contactUsTestData } from '../../../../src/data/test-data/contact-us.data.js';
 
 const attachmentPath = fileURLToPath(
-  new URL('../../../fixtures/contact-us-upload.txt', import.meta.url),
+  new URL('../../../../src/data/files/contact-us-upload.txt', import.meta.url),
 );
 
 test('TC 6 - user can submit the Contact Us form @static', async ({
